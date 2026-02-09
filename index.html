@@ -1,0 +1,1965 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>AI 解決方案媒合管理系統</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #4b6cb7;
+            --primary-dark: #182848;
+            --secondary: #8a2be2;
+            --accent: #00b4d8;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --card-hover-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --border-radius: 16px;
+            --border-radius-sm: 10px;
+            --gradient-primary: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            --gradient-secondary: linear-gradient(135deg, var(--secondary) 0%, #5a189a 100%);
+            --gradient-accent: linear-gradient(135deg, var(--accent) 0%, #0077b6 100%);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft JhengHei', 'PingFang TC', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            color: var(--dark);
+            line-height: 1.7;
+            font-size: 16px;
+            min-height: 100vh;
+            padding-bottom: 40px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 30%, rgba(75, 108, 183, 0.05) 0%, transparent 50%),
+                       radial-gradient(circle at 80% 70%, rgba(138, 43, 226, 0.05) 0%, transparent 50%);
+            z-index: -1;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* 頂部裝飾 */
+        .top-decoration {
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+            margin-bottom: 30px;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* 頁頭 */
+        header {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 30px 0;
+            border-radius: var(--border-radius);
+            margin-bottom: 35px;
+            box-shadow: var(--card-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+        }
+        
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -10%;
+            width: 150px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 50%;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            padding: 0 25px;
+            gap: 25px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            flex: 1;
+            min-width: 280px;
+        }
+        
+        .logo-icon {
+            background: rgba(255, 255, 255, 0.15);
+            width: 70px;
+            height: 70px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .logo-text h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            line-height: 1.3;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .logo-text p {
+            opacity: 0.9;
+            font-size: 0.95rem;
+            margin-top: 5px;
+            font-weight: 300;
+        }
+        
+        .stats {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .stat-box {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 20px;
+            border-radius: var(--border-radius-sm);
+            text-align: center;
+            min-width: 130px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: var(--transition);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-box:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 5px;
+            background: linear-gradient(to right, #ffffff, #e0e7ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+        
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 35px;
+        }
+        
+        /* 行動裝置選單切換 */
+        .mobile-menu-toggle {
+            display: none;
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius-sm);
+            padding: 16px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 20px;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            box-shadow: 0 8px 20px rgba(75, 108, 183, 0.3);
+            transition: var(--transition);
+        }
+        
+        .mobile-menu-toggle:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(75, 108, 183, 0.4);
+        }
+        
+        .mobile-menu-toggle:active {
+            transform: translateY(0);
+        }
+        
+        /* 側邊欄 */
+        .sidebar {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--card-shadow);
+            height: fit-content;
+            transition: var(--transition);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .sidebar.active {
+            display: block;
+        }
+        
+        .sidebar h3 {
+            margin-bottom: 25px;
+            color: var(--primary-dark);
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--light-gray);
+            font-size: 1.4rem;
+            font-weight: 700;
+            position: relative;
+        }
+        
+        .sidebar h3::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 80px;
+            height: 2px;
+            background: var(--gradient-primary);
+        }
+        
+        .filter-group {
+            margin-bottom: 28px;
+            background: var(--light);
+            padding: 20px;
+            border-radius: var(--border-radius-sm);
+            border-left: 4px solid var(--primary);
+        }
+        
+        .filter-group h4 {
+            margin-bottom: 15px;
+            color: var(--primary);
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .filter-group h4 i {
+            font-size: 1.2rem;
+        }
+        
+        .filter-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .filter-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            padding: 14px 15px;
+            border-radius: var(--border-radius-sm);
+            transition: var(--transition);
+            border: 1px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .filter-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(75, 108, 183, 0.05), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .filter-option:hover::before {
+            left: 100%;
+        }
+        
+        .filter-option:hover {
+            background-color: rgba(75, 108, 183, 0.05);
+            border-color: rgba(75, 108, 183, 0.2);
+            transform: translateX(5px);
+        }
+        
+        .filter-option.active {
+            background-color: rgba(75, 108, 183, 0.1);
+            color: var(--primary);
+            font-weight: 600;
+            border-color: rgba(75, 108, 183, 0.3);
+            box-shadow: 0 5px 15px rgba(75, 108, 183, 0.1);
+        }
+        
+        .filter-checkbox {
+            width: 22px;
+            height: 22px;
+            accent-color: var(--primary);
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+        
+        .search-box {
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 18px 20px 18px 55px;
+            border: 2px solid var(--light-gray);
+            border-radius: var(--border-radius-sm);
+            font-size: 1rem;
+            transition: var(--transition);
+            background: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.03);
+        }
+        
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 5px 20px rgba(75, 108, 183, 0.2);
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+            font-size: 1.2rem;
+        }
+        
+        .dashboard {
+            display: flex;
+            flex-direction: column;
+            gap: 35px;
+        }
+        
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .dashboard-header h2 {
+            color: var(--primary-dark);
+            font-size: 1.8rem;
+            flex: 1;
+            font-weight: 700;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .dashboard-header h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100px;
+            height: 3px;
+            background: var(--gradient-primary);
+            border-radius: 3px;
+        }
+        
+        /* 主內容卡片 - 每個公司一個卡片 */
+        .company-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+        }
+        
+        .company-card {
+            background: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            position: relative;
+        }
+        
+        .company-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--card-hover-shadow);
+        }
+        
+        .company-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--gradient-primary);
+        }
+        
+        .company-card-header {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 25px;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .company-card-header::after {
+            content: '';
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+        
+        .company-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .company-contact {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95rem;
+            opacity: 0.9;
+            margin-top: 15px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .company-contact i {
+            font-size: 1.1rem;
+        }
+        
+        .company-card-body {
+            padding: 25px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .company-projects {
+            margin-bottom: 25px;
+        }
+        
+        .company-projects h4 {
+            color: var(--primary-dark);
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+        
+        .project-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .project-item {
+            background: var(--light);
+            padding: 18px;
+            border-radius: var(--border-radius-sm);
+            border-left: 4px solid var(--accent);
+            transition: var(--transition);
+        }
+        
+        .project-item:hover {
+            background: #f0f4ff;
+            transform: translateX(5px);
+        }
+        
+        .project-title {
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 8px;
+            font-size: 1.05rem;
+        }
+        
+        .project-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .project-price {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary);
+            background: rgba(75, 108, 183, 0.1);
+            padding: 5px 12px;
+            border-radius: 20px;
+        }
+        
+        .project-duration {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+            color: var(--gray);
+            background: rgba(108, 117, 125, 0.1);
+            padding: 5px 12px;
+            border-radius: 20px;
+        }
+        
+        .project-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .feature-tag {
+            background-color: rgba(75, 108, 183, 0.1);
+            color: var(--primary);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: var(--transition);
+            border: 1px solid rgba(75, 108, 183, 0.2);
+        }
+        
+        .feature-tag:hover {
+            background-color: rgba(75, 108, 183, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .company-features {
+            margin-top: auto;
+            padding-top: 20px;
+            border-top: 1px solid var(--light-gray);
+        }
+        
+        .company-features h5 {
+            color: var(--primary-dark);
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
+        .all-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .all-feature-tag {
+            background: linear-gradient(135deg, #f0f4ff, #e6eeff);
+            color: var(--primary);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid rgba(75, 108, 183, 0.2);
+            transition: var(--transition);
+        }
+        
+        .all-feature-tag:hover {
+            background: linear-gradient(135deg, #e6eeff, #d6e4ff);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(75, 108, 183, 0.2);
+        }
+        
+        .all-feature-tag i {
+            font-size: 0.9rem;
+        }
+        
+        /* 圖表容器 */
+        .chart-container {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            position: relative;
+        }
+        
+        .chart-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--gradient-secondary);
+        }
+        
+        .chart-title {
+            margin-bottom: 25px;
+            color: var(--primary-dark);
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .chart-title i {
+            color: var(--secondary);
+            font-size: 1.8rem;
+        }
+        
+        .chart-wrapper {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
+        
+        /* 重設按鈕 */
+        .reset-btn {
+            width: 100%;
+            padding: 18px;
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            font-size: 1.1rem;
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            transition: var(--transition);
+            font-weight: 600;
+            box-shadow: 0 8px 20px rgba(75, 108, 183, 0.3);
+        }
+        
+        .reset-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(75, 108, 183, 0.4);
+        }
+        
+        .reset-btn:active {
+            transform: translateY(0);
+        }
+        
+        /* 手機版關閉按鈕 */
+        .close-sidebar {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1001;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: var(--transition);
+        }
+        
+        .close-sidebar:hover {
+            transform: rotate(90deg);
+        }
+        
+        /* 手機版樣式 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 15px;
+            }
+            
+            .top-decoration {
+                margin-bottom: 20px;
+            }
+            
+            header {
+                padding: 25px 0;
+                margin-bottom: 25px;
+                border-radius: 15px;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+                padding: 0 15px;
+            }
+            
+            .logo {
+                justify-content: center;
+                text-align: center;
+                min-width: auto;
+            }
+            
+            .logo-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 1.8rem;
+            }
+            
+            .logo-text h1 {
+                font-size: 1.5rem;
+            }
+            
+            .stats {
+                width: 100%;
+                justify-content: space-between;
+                gap: 15px;
+            }
+            
+            .stat-box {
+                min-width: 100px;
+                padding: 15px 10px;
+                flex: 1;
+            }
+            
+            .stat-value {
+                font-size: 1.6rem;
+            }
+            
+            .mobile-menu-toggle {
+                display: flex;
+            }
+            
+            .sidebar {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 1000;
+                overflow-y: auto;
+                border-radius: 0;
+                padding-top: 80px;
+            }
+            
+            .sidebar.active {
+                display: block;
+            }
+            
+            .company-cards {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .company-card-header {
+                padding: 20px;
+            }
+            
+            .company-card-body {
+                padding: 20px;
+            }
+            
+            .chart-container {
+                padding: 20px;
+            }
+            
+            .chart-title {
+                font-size: 1.3rem;
+            }
+            
+            .chart-wrapper {
+                height: 300px;
+            }
+            
+            .filter-option {
+                padding: 16px 15px;
+            }
+            
+            .search-box input {
+                padding: 18px 20px 18px 55px;
+            }
+            
+            .reset-btn {
+                padding: 20px;
+            }
+            
+            .project-details {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .logo-text h1 {
+                font-size: 1.3rem;
+            }
+            
+            .stat-box {
+                min-width: 85px;
+                padding: 12px 8px;
+            }
+            
+            .stat-value {
+                font-size: 1.4rem;
+            }
+            
+            .company-name {
+                font-size: 1.3rem;
+            }
+            
+            .project-price {
+                font-size: 1.1rem;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .main-content {
+                flex-direction: row;
+            }
+            
+            .sidebar {
+                width: 320px;
+                flex-shrink: 0;
+            }
+            
+            .dashboard {
+                flex: 1;
+            }
+        }
+        
+        /* 觸控優化 */
+        button, 
+        .filter-option,
+        .company-card,
+        .feature-tag,
+        .all-feature-tag {
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* 動畫效果 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .company-card {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+        
+        /* 滾動條美化 */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+        
+        /* 無結果提示 */
+        .no-results {
+            text-align: center;
+            padding: 60px 30px;
+            color: var(--gray);
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            grid-column: 1 / -1;
+        }
+        
+        .no-results i {
+            font-size: 4rem;
+            color: var(--light-gray);
+            margin-bottom: 20px;
+        }
+        
+        .no-results h3 {
+            font-size: 1.8rem;
+            color: var(--dark);
+            margin-bottom: 15px;
+        }
+        
+        .no-results p {
+            font-size: 1.1rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-decoration"></div>
+    
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>AI 解決方案媒合管理系統</h1>
+                        <p>一站式管理AI需求與供應商匹配</p>
+                    </div>
+                </div>
+                <div class="stats">
+                    <div class="stat-box">
+                        <div class="stat-value" id="total-companies">18</div>
+                        <div class="stat-label">合作公司</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="total-projects">30</div>
+                        <div class="stat-label">總專案數</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="total-amount">4.2M</div>
+                        <div class="stat-label">總金額 (NTD)</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="avg-duration">5</div>
+                        <div class="stat-label">平均月數</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- 手機版選單開關 -->
+        <button class="mobile-menu-toggle" id="mobile-menu-toggle">
+            <i class="fas fa-filter"></i>
+            <span>篩選與搜尋</span>
+            <i class="fas fa-chevron-down" id="menu-arrow"></i>
+        </button>
+        
+        <div class="main-content">
+            <div class="sidebar" id="sidebar">
+                <!-- 手機版關閉按鈕 -->
+                <button class="close-sidebar" id="close-sidebar" style="display: none;">
+                    <i class="fas fa-times"></i>
+                </button>
+                
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="search-input" placeholder="搜尋公司、專案或關鍵字...">
+                </div>
+                
+                <div class="filter-group">
+                    <h4><i class="fas fa-brain"></i> AI 功能類型</h4>
+                    <div class="filter-options" id="function-filter">
+                        <!-- 功能篩選選項會由JavaScript動態生成 -->
+                    </div>
+                </div>
+                
+                <div class="filter-group">
+                    <h4><i class="fas fa-money-bill-wave"></i> 專案金額 (NTD)</h4>
+                    <div class="filter-options" id="price-filter">
+                        <div class="filter-option active" data-price="all">
+                            <input type="radio" class="filter-checkbox" name="price" checked>
+                            <span>全部金額</span>
+                        </div>
+                        <div class="filter-option" data-price="0-100000">
+                            <input type="radio" class="filter-checkbox" name="price">
+                            <span>10萬以下</span>
+                        </div>
+                        <div class="filter-option" data-price="100000-300000">
+                            <input type="radio" class="filter-checkbox" name="price">
+                            <span>10萬 - 30萬</span>
+                        </div>
+                        <div class="filter-option" data-price="300000-500000">
+                            <input type="radio" class="filter-checkbox" name="price">
+                            <span>30萬 - 50萬</span>
+                        </div>
+                        <div class="filter-option" data-price="500000">
+                            <input type="radio" class="filter-checkbox" name="price">
+                            <span>50萬以上</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="filter-group">
+                    <h4><i class="far fa-clock"></i> 專案時間</h4>
+                    <div class="filter-options" id="duration-filter">
+                        <div class="filter-option active" data-duration="all">
+                            <input type="radio" class="filter-checkbox" name="duration" checked>
+                            <span>全部時間</span>
+                        </div>
+                        <div class="filter-option" data-duration="0-3">
+                            <input type="radio" class="filter-checkbox" name="duration">
+                            <span>3個月內</span>
+                        </div>
+                        <div class="filter-option" data-duration="4-6">
+                            <input type="radio" class="filter-checkbox" name="duration">
+                            <span>4-6個月</span>
+                        </div>
+                        <div class="filter-option" data-duration="7-12">
+                            <input type="radio" class="filter-checkbox" name="duration">
+                            <span>7-12個月</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="reset-btn" id="reset-filters">
+                    <i class="fas fa-redo"></i> 重設篩選條件
+                </button>
+            </div>
+            
+            <div class="dashboard">
+                <div class="dashboard-header">
+                    <h2>合作公司與專案總覽</h2>
+                </div>
+                
+                <div class="company-cards" id="company-cards-container">
+                    <!-- 公司卡片會由JavaScript動態生成 -->
+                </div>
+                
+                <div class="chart-container">
+                    <h3 class="chart-title">
+                        <i class="fas fa-chart-bar"></i> 
+                        AI 功能需求分佈
+                    </h3>
+                    <div class="chart-wrapper">
+                        <canvas id="ai-features-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 從Excel數據中提取AI功能列表
+        const aiFeatures = [
+            "碳管理", "用電管理", "網路開店", "收銀管理", "VR", "AR", 
+            "客服機器人", "會議機器人", "GenAI 表單圖片生成", "人因工時檢測", 
+            "生產作業管理", "行銷管理", "設備管理", "環境管理", "人事管理", 
+            "財務管理", "採購管理", "研發管理", "庫存管理", "網頁製作行銷", 
+            "多語系", "統計分析", "影像分析訓練", "AI問卷", "AI生成影片", 
+            "AI 電路板檢測", "智慧工安", "資安", "文件管理系統", "製圖管理", 
+            "法律合約審查"
+        ];
+        
+        // 原始專案數據
+        const allProjects = [
+            {
+                company: "愛實境",
+                price: 117000,
+                duration: 9,
+                features: ["網路開店", "VR", "生產作業管理", "行銷管理", "設備管理", "環境管理"],
+                contact: "丁客戶成功經理",
+                email: "dean@istaging.com",
+                keywords: "線上開店，客戶管理。"
+            },
+            {
+                company: "愛實境",
+                price: 600000,
+                duration: 3,
+                features: ["VR", "會議機器人", "行銷管理", "環境管理"],
+                contact: "丁客戶成功經理",
+                email: "dean@istaging.com",
+                keywords: "遠端會VR會議，參展"
+            },
+            {
+                company: "冠理科技",
+                price: 100000,
+                duration: 6,
+                features: ["生產作業管理", "財務管理", "採購管理", "研發管理", "庫存管理"],
+                contact: "吳專案助理",
+                email: "chiangs@chiangsgp.com",
+                keywords: "ERP 銷售 庫存 研發管理"
+            },
+            {
+                company: "安卓資訊",
+                price: 59000,
+                duration: 6,
+                features: ["行銷管理", "人事管理"],
+                contact: "潘經理",
+                email: "peter@andr.com.tw",
+                keywords: "人事管理系統"
+            },
+            {
+                company: "雷斯媒體",
+                price: 150000,
+                duration: 3,
+                features: ["網頁製作行銷", "多語系"],
+                contact: "劉業務經理",
+                email: "allen@letsmedia.com.tw",
+                keywords: "形象官網多語系支援系統"
+            },
+            {
+                company: "庫點子",
+                price: 300000,
+                duration: 3,
+                features: ["行銷管理", "環境管理", "人事管理", "統計分析", "AI問卷"],
+                contact: "郭規劃師",
+                email: "cdit980803@gmail.com",
+                keywords: "智慧問卷生成系統"
+            },
+            {
+                company: "庫點子",
+                price: 300000,
+                duration: 3,
+                features: ["網路開店", "收銀管理", "資安"],
+                contact: "郭規劃師",
+                email: "cdit980804@gmail.com",
+                keywords: "智慧打單 平台整合系統"
+            },
+            {
+                company: "冠富行銷",
+                price: 50000,
+                duration: 1,
+                features: ["AI生成影片"],
+                contact: "何專案助理",
+                email: "qqho@crowndesign.com.tw",
+                keywords: "自動影片生成系統"
+            },
+            {
+                company: "采威國際",
+                price: 315000,
+                duration: 12,
+                features: ["碳管理", "設備管理", "環境管理", "庫存管理", "統計分析"],
+                contact: "簡副理",
+                email: "ivychien@iscom.com.tw",
+                keywords: "碳排預測整合方案"
+            },
+            {
+                company: "睿元科技",
+                price: 300000,
+                duration: 1,
+                features: ["AI 電路板檢測"],
+                contact: "蘇總經理",
+                email: "juilung@seed.net.tw",
+                keywords: "PCB 智慧判別系統"
+            },
+            {
+                company: "睿元科技",
+                price: 300000,
+                duration: 1,
+                features: ["碳管理", "行銷管理", "設備管理", "環境管理", "庫存管理", "文件管理系統"],
+                contact: "蘇總經理",
+                email: "juilung@seed.net.tw",
+                keywords: "碳排管理系統"
+            },
+            {
+                company: "中陽資訊",
+                price: 300000,
+                duration: 1,
+                features: ["資安"],
+                contact: "曾專案規劃師",
+                email: "abo@joyyoung.com.tw",
+                keywords: "資安服務"
+            },
+            {
+                company: "八涼科技",
+                price: 300000,
+                duration: 1,
+                features: ["製圖管理"],
+                contact: "梅負責人",
+                email: "alex@remotenc.com",
+                keywords: "圖片管理系統"
+            },
+            {
+                company: "百加資通",
+                price: 102375,
+                duration: 6,
+                features: ["客服機器人", "人事管理"],
+                contact: "陳顧問",
+                email: "smile.chen@hundredplus.com",
+                keywords: "問答資料訓練客服平台"
+            },
+            {
+                company: "谷林運算",
+                price: 300000,
+                duration: 2,
+                features: ["用電管理"],
+                contact: "洪資深專員",
+                email: "joy.hung@goodlinker.io",
+                keywords: "用電管理Dashboard"
+            },
+            {
+                company: "所羅門",
+                price: 500000,
+                duration: 2,
+                features: ["設備管理"],
+                contact: "楊資深專員",
+                email: "andrew_yang@solomon.com.tw",
+                keywords: "硬體整合 光學整合 圖形化 視覺系統整合平台"
+            },
+            {
+                company: "所羅門",
+                price: 150000,
+                duration: 1,
+                features: ["影像分析訓練"],
+                contact: "楊資深專員",
+                email: "andrew_yang@solomon.com.tw",
+                keywords: "生產設備物件瑕疵判別"
+            },
+            {
+                company: "所羅門",
+                price: 400000,
+                duration: 2,
+                features: ["AR"],
+                contact: "楊資深專員",
+                email: "andrew_yang@solomon.com.tw",
+                keywords: "穿戴式AI 產線解決方案"
+            },
+            {
+                company: "狀態網路",
+                price: 300000,
+                duration: 3,
+                features: ["GenAI 表單圖片生成"],
+                contact: "李辦公室助理",
+                email: "jingli@status.com.tw",
+                keywords: "表單自動生成"
+            },
+            {
+                company: "律果科技",
+                price: 200000,
+                duration: 12,
+                features: ["法律合約審查"],
+                contact: "簡營運長",
+                email: "joy@legalsign.ai",
+                keywords: "契約審查 草擬契約生成"
+            },
+            {
+                company: "科智企業",
+                price: 315000,
+                duration: 1,
+                features: ["人因工時檢測", "設備管理", "環境管理"],
+                contact: "謝專案管理師",
+                email: "zoehsieh@servtech.com.tw",
+                keywords: "物料管理 人因檢測 工時計算"
+            },
+            {
+                company: "迪威智能",
+                price: 65100,
+                duration: 12,
+                features: ["會議機器人", "多語系"],
+                contact: "林業務經理",
+                email: "alex.lin@dwave.cc",
+                keywords: "國際會議重點管理與翻譯"
+            },
+            {
+                company: "艾美力",
+                price: 300000,
+                duration: 1,
+                features: ["收銀管理"],
+                contact: "顧總經理",
+                email: "gavin.gu6@gmail.com",
+                keywords: "收銀管理系統"
+            },
+            {
+                company: "谷林運算",
+                price: 400000,
+                duration: 2,
+                features: ["用電管理", "環境管理"],
+                contact: "洪資深專員",
+                email: "joy.hung@goodlinker.io",
+                keywords: "用電分析 異常預警"
+            },
+            {
+                company: "以力",
+                price: 5988,
+                duration: 12,
+                features: ["客服機器人"],
+                contact: "徐產品經理",
+                email: "janice.hsu@eslitec.com",
+                keywords: "Line 客服系統"
+            },
+            {
+                company: "伊斯酷",
+                price: 300000,
+                duration: 12,
+                features: ["用電管理", "生產作業管理", "設備管理"],
+                contact: "謝資深營運經理",
+                email: "joanne@iscoollab.com",
+                keywords: "生產設備監控 CAD存取與判讀"
+            },
+            {
+                company: "網擎科技",
+                price: 10500,
+                duration: 3,
+                features: ["資安"],
+                contact: "潘行銷企劃專員",
+                email: "producer@openfind.com.tw",
+                keywords: "資安服務"
+            },
+            {
+                company: "叡暘資訊",
+                price: 74500,
+                duration: 4,
+                features: ["文件管理系統"],
+                contact: "楊業務",
+                email: "ray_zr_yang@gss.com.tw",
+                keywords: "智慧文件管理系統"
+            },
+            {
+                company: "瀚錸科技",
+                price: 300000,
+                duration: 6,
+                features: ["客服機器人"],
+                contact: "李軟體主任",
+                email: "erichsu@netbridgetech.com.tw",
+                keywords: "客服系統"
+            },
+            {
+                company: "達易製造",
+                price: 283500,
+                duration: 9,
+                features: ["用電管理", "生產作業管理", "設備管理"],
+                contact: "吳產品經理",
+                email: "yufan.wu@dotzero.tech",
+                keywords: "產線管理系統 人員效率管理"
+            }
+        ];
+        
+        // 計算統計數據
+        function calculateStats() {
+            // 將專案按公司分組
+            const companies = groupProjectsByCompany(allProjects);
+            const totalCompanies = Object.keys(companies).length;
+            const totalProjects = allProjects.length;
+            const totalAmount = allProjects.reduce((sum, project) => sum + project.price, 0);
+            const avgDuration = Math.round(allProjects.reduce((sum, project) => sum + project.duration, 0) / totalProjects);
+            
+            document.getElementById('total-companies').textContent = totalCompanies;
+            document.getElementById('total-projects').textContent = totalProjects;
+            document.getElementById('total-amount').textContent = (totalAmount / 1000000).toFixed(1) + 'M';
+            document.getElementById('avg-duration').textContent = avgDuration;
+        }
+        
+        // 將專案按公司分組
+        function groupProjectsByCompany(projects) {
+            const companies = {};
+            
+            projects.forEach(project => {
+                if (!companies[project.company]) {
+                    companies[project.company] = {
+                        name: project.company,
+                        contact: project.contact,
+                        email: project.email,
+                        projects: [],
+                        allFeatures: new Set()
+                    };
+                }
+                
+                companies[project.company].projects.push({
+                    price: project.price,
+                    duration: project.duration,
+                    features: project.features,
+                    keywords: project.keywords
+                });
+                
+                // 收集該公司所有功能
+                project.features.forEach(feature => {
+                    companies[project.company].allFeatures.add(feature);
+                });
+            });
+            
+            return companies;
+        }
+        
+        // 初始化功能篩選選項
+        function initFunctionFilters() {
+            const functionFilterContainer = document.getElementById('function-filter');
+            
+            // 添加"全部"選項
+            const allOption = document.createElement('div');
+            allOption.className = 'filter-option active';
+            allOption.dataset.function = 'all';
+            allOption.innerHTML = `
+                <input type="radio" class="filter-checkbox" name="function" checked>
+                <span>全部功能</span>
+            `;
+            functionFilterContainer.appendChild(allOption);
+            
+            // 添加AI功能選項
+            aiFeatures.forEach(feature => {
+                const option = document.createElement('div');
+                option.className = 'filter-option';
+                option.dataset.function = feature;
+                option.innerHTML = `
+                    <input type="radio" class="filter-checkbox" name="function">
+                    <span>${feature}</span>
+                `;
+                functionFilterContainer.appendChild(option);
+            });
+            
+            // 為功能篩選添加點擊事件
+            document.querySelectorAll('#function-filter .filter-option').forEach(option => {
+                option.addEventListener('click', function(e) {
+                    // 防止觸控設備上的雙擊縮放
+                    if (e.cancelable) e.preventDefault();
+                    
+                    // 更新選中狀態
+                    document.querySelectorAll('#function-filter .filter-option').forEach(opt => {
+                        opt.classList.remove('active');
+                        opt.querySelector('input').checked = false;
+                    });
+                    
+                    this.classList.add('active');
+                    this.querySelector('input').checked = true;
+                    
+                    // 過濾項目
+                    filterCompanies();
+                    
+                    // 手機版：篩選後自動關閉側邊欄
+                    if (window.innerWidth <= 768) {
+                        closeMobileSidebar();
+                    }
+                });
+            });
+        }
+        
+        // 為價格篩選添加事件
+        document.querySelectorAll('#price-filter .filter-option').forEach(option => {
+            option.addEventListener('click', function(e) {
+                if (e.cancelable) e.preventDefault();
+                
+                // 更新選中狀態
+                document.querySelectorAll('#price-filter .filter-option').forEach(opt => {
+                    opt.classList.remove('active');
+                    opt.querySelector('input').checked = false;
+                });
+                
+                this.classList.add('active');
+                this.querySelector('input').checked = true;
+                
+                // 過濾項目
+                filterCompanies();
+                
+                // 手機版：篩選後自動關閉側邊欄
+                if (window.innerWidth <= 768) {
+                    closeMobileSidebar();
+                }
+            });
+        });
+        
+        // 為時間篩選添加事件
+        document.querySelectorAll('#duration-filter .filter-option').forEach(option => {
+            option.addEventListener('click', function(e) {
+                if (e.cancelable) e.preventDefault();
+                
+                // 更新選中狀態
+                document.querySelectorAll('#duration-filter .filter-option').forEach(opt => {
+                    opt.classList.remove('active');
+                    opt.querySelector('input').checked = false;
+                });
+                
+                this.classList.add('active');
+                this.querySelector('input').checked = true;
+                
+                // 過濾項目
+                filterCompanies();
+                
+                // 手機版：篩選後自動關閉側邊欄
+                if (window.innerWidth <= 768) {
+                    closeMobileSidebar();
+                }
+            });
+        });
+        
+        // 重設篩選條件
+        document.getElementById('reset-filters').addEventListener('click', function(e) {
+            if (e.cancelable) e.preventDefault();
+            
+            // 重設功能篩選
+            document.querySelectorAll('#function-filter .filter-option').forEach(option => {
+                option.classList.remove('active');
+                option.querySelector('input').checked = false;
+            });
+            document.querySelector('#function-filter .filter-option[data-function="all"]').classList.add('active');
+            document.querySelector('#function-filter .filter-option[data-function="all"] input').checked = true;
+            
+            // 重設價格篩選
+            document.querySelectorAll('#price-filter .filter-option').forEach(option => {
+                option.classList.remove('active');
+                option.querySelector('input').checked = false;
+            });
+            document.querySelector('#price-filter .filter-option[data-price="all"]').classList.add('active');
+            document.querySelector('#price-filter .filter-option[data-price="all"] input').checked = true;
+            
+            // 重設時間篩選
+            document.querySelectorAll('#duration-filter .filter-option').forEach(option => {
+                option.classList.remove('active');
+                option.querySelector('input').checked = false;
+            });
+            document.querySelector('#duration-filter .filter-option[data-duration="all"]').classList.add('active');
+            document.querySelector('#duration-filter .filter-option[data-duration="all"] input').checked = true;
+            
+            // 重設搜尋框
+            document.getElementById('search-input').value = '';
+            
+            // 重新顯示所有項目
+            filterCompanies();
+            
+            // 手機版：重設後自動關閉側邊欄
+            if (window.innerWidth <= 768) {
+                closeMobileSidebar();
+            }
+        });
+        
+        // 搜尋功能
+        let searchTimeout;
+        document.getElementById('search-input').addEventListener('input', function() {
+            // 防抖動處理，減少頻繁篩選
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(filterCompanies, 300);
+        });
+        
+        // 過濾公司
+        function filterCompanies() {
+            // 獲取搜尋關鍵字
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            
+            // 獲取選中的功能篩選
+            const selectedFunction = document.querySelector('#function-filter .filter-option.active').dataset.function;
+            
+            // 獲取選中的價格篩選
+            const selectedPrice = document.querySelector('#price-filter .filter-option.active').dataset.price;
+            
+            // 獲取選中的時間篩選
+            const selectedDuration = document.querySelector('#duration-filter .filter-option.active').dataset.duration;
+            
+            // 首先過濾專案
+            const filteredProjects = allProjects.filter(project => {
+                // 搜尋篩選
+                const matchesSearch = searchTerm === '' || 
+                    project.company.toLowerCase().includes(searchTerm) ||
+                    project.keywords.toLowerCase().includes(searchTerm) ||
+                    project.features.some(feature => feature.toLowerCase().includes(searchTerm));
+                
+                // 功能篩選
+                const matchesFunction = selectedFunction === 'all' || project.features.includes(selectedFunction);
+                
+                // 價格篩選
+                let matchesPrice = true;
+                if (selectedPrice !== 'all') {
+                    const [min, max] = selectedPrice.split('-').map(Number);
+                    if (max) {
+                        matchesPrice = project.price >= min && project.price <= max;
+                    } else {
+                        matchesPrice = project.price >= min;
+                    }
+                }
+                
+                // 時間篩選
+                let matchesDuration = true;
+                if (selectedDuration !== 'all') {
+                    const [min, max] = selectedDuration.split('-').map(Number);
+                    if (max) {
+                        matchesDuration = project.duration >= min && project.duration <= max;
+                    } else {
+                        matchesDuration = project.duration >= min;
+                    }
+                }
+                
+                return matchesSearch && matchesFunction && matchesPrice && matchesDuration;
+            });
+            
+            // 將過濾後的專案按公司分組
+            const filteredCompanies = groupProjectsByCompany(filteredProjects);
+            
+            // 更新顯示的公司卡片
+            displayCompanyCards(filteredCompanies);
+            updateChart(filteredProjects);
+        }
+        
+        // 顯示公司卡片
+        function displayCompanyCards(companies) {
+            const container = document.getElementById('company-cards-container');
+            
+            // 清空容器
+            container.innerHTML = '';
+            
+            // 如果沒有匹配的公司
+            if (Object.keys(companies).length === 0) {
+                container.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-search"></i>
+                        <h3>找不到符合條件的公司</h3>
+                        <p>請嘗試調整搜尋關鍵字或篩選條件</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // 生成公司卡片
+            Object.values(companies).forEach(company => {
+                const card = document.createElement('div');
+                card.className = 'company-card';
+                
+                // 計算公司總金額
+                const totalAmount = company.projects.reduce((sum, project) => sum + project.price, 0);
+                const formattedTotalAmount = totalAmount.toLocaleString('zh-TW');
+                
+                // 生成專案列表HTML
+                const projectsHTML = company.projects.map(project => {
+                    const formattedPrice = project.price.toLocaleString('zh-TW');
+                    
+                    // 為功能標籤選擇圖標
+                    const getFeatureIcon = (feature) => {
+                        const icons = {
+                            '碳管理': 'fas fa-leaf',
+                            '用電管理': 'fas fa-bolt',
+                            '網路開店': 'fas fa-store',
+                            '收銀管理': 'fas fa-cash-register',
+                            'VR': 'fas fa-vr-cardboard',
+                            'AR': 'fas fa-mobile-alt',
+                            '客服機器人': 'fas fa-robot',
+                            '會議機器人': 'fas fa-video',
+                            'GenAI 表單圖片生成': 'fas fa-image',
+                            '人因工時檢測': 'fas fa-user-clock',
+                            '生產作業管理': 'fas fa-industry',
+                            '行銷管理': 'fas fa-bullhorn',
+                            '設備管理': 'fas fa-tools',
+                            '環境管理': 'fas fa-recycle',
+                            '人事管理': 'fas fa-users',
+                            '財務管理': 'fas fa-chart-line',
+                            '採購管理': 'fas fa-shopping-cart',
+                            '研發管理': 'fas fa-flask',
+                            '庫存管理': 'fas fa-boxes',
+                            '網頁製作行銷': 'fas fa-code',
+                            '多語系': 'fas fa-language',
+                            '統計分析': 'fas fa-chart-bar',
+                            '影像分析訓練': 'fas fa-eye',
+                            'AI問卷': 'fas fa-question-circle',
+                            'AI生成影片': 'fas fa-film',
+                            'AI 電路板檢測': 'fas fa-microchip',
+                            '智慧工安': 'fas fa-hard-hat',
+                            '資安': 'fas fa-shield-alt',
+                            '文件管理系統': 'fas fa-file-alt',
+                            '製圖管理': 'fas fa-drafting-compass',
+                            '法律合約審查': 'fas fa-gavel'
+                        };
+                        return icons[feature] || 'fas fa-cog';
+                    };
+                    
+                    const featureTags = project.features.map(feature => 
+                        `<span class="feature-tag">${feature}</span>`
+                    ).join('');
+                    
+                    return `
+                        <div class="project-item">
+                            <div class="project-title">${project.keywords}</div>
+                            <div class="project-details">
+                                <div class="project-price">NT$ ${formattedPrice}</div>
+                                <div class="project-duration">
+                                    <i class="far fa-calendar-alt"></i>
+                                    <span>${project.duration} 個月</span>
+                                </div>
+                            </div>
+                            <div class="project-features">
+                                ${featureTags}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                // 生成功能標籤HTML
+                const allFeaturesArray = Array.from(company.allFeatures);
+                const allFeaturesHTML = allFeaturesArray.map(feature => {
+                    // 為功能標籤選擇圖標
+                    const getFeatureIcon = (feature) => {
+                        const icons = {
+                            '碳管理': 'fas fa-leaf',
+                            '用電管理': 'fas fa-bolt',
+                            '網路開店': 'fas fa-store',
+                            '收銀管理': 'fas fa-cash-register',
+                            'VR': 'fas fa-vr-cardboard',
+                            'AR': 'fas fa-mobile-alt',
+                            '客服機器人': 'fas fa-robot',
+                            '會議機器人': 'fas fa-video',
+                            'GenAI 表單圖片生成': 'fas fa-image',
+                            '人因工時檢測': 'fas fa-user-clock',
+                            '生產作業管理': 'fas fa-industry',
+                            '行銷管理': 'fas fa-bullhorn',
+                            '設備管理': 'fas fa-tools',
+                            '環境管理': 'fas fa-recycle',
+                            '人事管理': 'fas fa-users',
+                            '財務管理': 'fas fa-chart-line',
+                            '採購管理': 'fas fa-shopping-cart',
+                            '研發管理': 'fas fa-flask',
+                            '庫存管理': 'fas fa-boxes',
+                            '網頁製作行銷': 'fas fa-code',
+                            '多語系': 'fas fa-language',
+                            '統計分析': 'fas fa-chart-bar',
+                            '影像分析訓練': 'fas fa-eye',
+                            'AI問卷': 'fas fa-question-circle',
+                            'AI生成影片': 'fas fa-film',
+                            'AI 電路板檢測': 'fas fa-microchip',
+                            '智慧工安': 'fas fa-hard-hat',
+                            '資安': 'fas fa-shield-alt',
+                            '文件管理系統': 'fas fa-file-alt',
+                            '製圖管理': 'fas fa-drafting-compass',
+                            '法律合約審查': 'fas fa-gavel'
+                        };
+                        return icons[feature] || 'fas fa-cog';
+                    };
+                    
+                    return `
+                        <span class="all-feature-tag">
+                            <i class="${getFeatureIcon(feature)}"></i>
+                            <span>${feature}</span>
+                        </span>
+                    `;
+                }).join('');
+                
+                card.innerHTML = `
+                    <div class="company-card-header">
+                        <div class="company-name">${company.name}</div>
+                        <div class="company-contact">
+                            <i class="fas fa-user"></i>
+                            <span>${company.contact}</span>
+                            <i class="fas fa-envelope"></i>
+                            <span>${company.email}</span>
+                        </div>
+                    </div>
+                    <div class="company-card-body">
+                        <div class="company-projects">
+                            <h4><i class="fas fa-project-diagram"></i> 專案列表 (${company.projects.length}個)</h4>
+                            <div class="project-list">
+                                ${projectsHTML}
+                            </div>
+                        </div>
+                        <div class="company-features">
+                            <h5><i class="fas fa-cogs"></i> 所有AI功能</h5>
+                            <div class="all-features">
+                                ${allFeaturesHTML}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+        
+        // 更新圖表
+        let aiFeaturesChart;
+        function updateChart(filteredProjects) {
+            // 計算每個功能的出現次數
+            const featureCounts = {};
+            aiFeatures.forEach(feature => {
+                featureCounts[feature] = 0;
+            });
+            
+            filteredProjects.forEach(project => {
+                project.features.forEach(feature => {
+                    if (featureCounts.hasOwnProperty(feature)) {
+                        featureCounts[feature]++;
+                    }
+                });
+            });
+            
+            // 排序並選擇前12個最常見的功能
+            const sortedFeatures = Object.entries(featureCounts)
+                .filter(([_, count]) => count > 0)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 12);
+            
+            const featureNames = sortedFeatures.map(item => item[0]);
+            const featureValues = sortedFeatures.map(item => item[1]);
+            
+            // 生成漸變顏色
+            const generateGradientColors = (count) => {
+                const colors = [];
+                for (let i = 0; i < count; i++) {
+                    const hue = (i * 30) % 360;
+                    colors.push(`hsla(${hue}, 70%, 60%, 0.8)`);
+                }
+                return colors;
+            };
+            
+            const backgroundColors = generateGradientColors(featureNames.length);
+            
+            // 獲取圖表上下文
+            const ctx = document.getElementById('ai-features-chart').getContext('2d');
+            
+            // 如果已存在圖表，則銷毀它
+            if (aiFeaturesChart) {
+                aiFeaturesChart.destroy();
+            }
+            
+            // 創建新圖表
+            aiFeaturesChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: featureNames,
+                    datasets: [{
+                        label: '需求次數',
+                        data: featureValues,
+                        backgroundColor: backgroundColors,
+                        borderColor: backgroundColors.map(color => color.replace('0.8', '1')),
+                        borderWidth: 1,
+                        borderRadius: 8,
+                        borderSkipped: false,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleFont: { size: 14 },
+                            bodyFont: { size: 13 },
+                            padding: 12,
+                            cornerRadius: 8,
+                            displayColors: true,
+                            callbacks: {
+                                label: function(context) {
+                                    return `需求次數: ${context.parsed.y}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1,
+                                font: {
+                                    size: 12
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                font: {
+                                    size: 11
+                                },
+                                maxRotation: 45
+                            },
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // 手機版側邊欄功能
+        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+        const sidebar = document.getElementById('sidebar');
+        const closeSidebarBtn = document.getElementById('close-sidebar');
+        const menuArrow = document.getElementById('menu-arrow');
+        
+        function toggleMobileSidebar() {
+            sidebar.classList.toggle('active');
+            closeSidebarBtn.style.display = sidebar.classList.contains('active') ? 'block' : 'none';
+            
+            // 更新箭頭方向
+            if (sidebar.classList.contains('active')) {
+                menuArrow.className = 'fas fa-chevron-up';
+                document.body.style.overflow = 'hidden'; // 防止背景滾動
+            } else {
+                menuArrow.className = 'fas fa-chevron-down';
+                document.body.style.overflow = '';
+            }
+        }
+        
+        function closeMobileSidebar() {
+            sidebar.classList.remove('active');
+            closeSidebarBtn.style.display = 'none';
+            menuArrow.className = 'fas fa-chevron-down';
+            document.body.style.overflow = '';
+        }
+        
+        // 手機版事件監聽
+        mobileMenuToggle.addEventListener('click', toggleMobileSidebar);
+        closeSidebarBtn.addEventListener('click', closeMobileSidebar);
+        
+        // 點擊側邊欄外部關閉
+        sidebar.addEventListener('click', function(e) {
+            if (e.target === sidebar) {
+                closeMobileSidebar();
+            }
+        });
+        
+        // 初始化頁面
+        function initPage() {
+            calculateStats();
+            initFunctionFilters();
+            
+            // 將專案按公司分組並顯示
+            const companies = groupProjectsByCompany(allProjects);
+            displayCompanyCards(companies);
+            updateChart(allProjects);
+        }
+        
+        // 頁面載入完成後初始化
+        document.addEventListener('DOMContentLoaded', initPage);
+    </script>
+</body>
+</html>
