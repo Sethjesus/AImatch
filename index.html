@@ -978,10 +978,6 @@
                         <div class="stat-label">總專案數</div>
                     </div>
                     <div class="stat-box">
-                        <div class="stat-value" id="total-amount">4.2M</div>
-                        <div class="stat-label">總金額 (NTD)</div>
-                    </div>
-                    <div class="stat-box">
                         <div class="stat-value" id="avg-duration">5</div>
                         <div class="stat-label">平均月數</div>
                     </div>
@@ -1288,7 +1284,7 @@
                 company: "科智企業",
                 price: 315000,
                 duration: 1,
-                features: ["人因工時檢測", "設備管理", "環境管理"],
+                features: ["人因工時檢測", "設備管理", "環境管理","智慧工安"],
                 contact: "謝專案管理師",
                 email: "zoehsieh@servtech.com.tw",
                 keywords: "物料管理 人因檢測 工時計算"
@@ -1382,12 +1378,10 @@
             const companies = groupProjectsByCompany(allProjects);
             const totalCompanies = Object.keys(companies).length;
             const totalProjects = allProjects.length;
-            const totalAmount = allProjects.reduce((sum, project) => sum + project.price, 0);
             const avgDuration = Math.round(allProjects.reduce((sum, project) => sum + project.duration, 0) / totalProjects);
             
             document.getElementById('total-companies').textContent = totalCompanies;
             document.getElementById('total-projects').textContent = totalProjects;
-            document.getElementById('total-amount').textContent = (totalAmount / 1000000).toFixed(1) + 'M';
             document.getElementById('avg-duration').textContent = avgDuration;
         }
         
